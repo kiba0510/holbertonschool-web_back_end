@@ -5,31 +5,40 @@ from base_caching import BaseCaching
 
 
 class LRUCache(BaseCaching):
-    """LRUCache class
-        BaseCaching (class): Basic class for this class
-    """
+    """LIFO Cache Class"""
+
     def __init__(self):
+        """Constructor Method"""
         super().__init__()
-        self.__keys = []
+        self.list_name = []
 
     def put(self, key, item):
-        """put item into cache_data with LIFO algorithm
-        """
-        if len(self.cache_data) == self.MAX_ITEMS and key not in self.__keys:
-            discard = self.__keys.pop(0)
-            del self.cache_data[discard]
+        """Put Method"""
+        if key is None or item is None:
+            return
+
+        self.cache_data[key] = item
+
+        if key not in self.list_name:
+            self.list_name.append(key)
+        else:
+            if self.list_name[-1] != key:
+                self.list_name.remove(key)
+                self.list_name.append(key)
+
+        if len(self.cache_data) > BaseCaching.MAX_ITEMS:
+            discard = self.list_name[0]
             print('DISCARD: {}'.format(discard))
-        if key and item:
-            if key in self.cache_data:
-                self.__keys.remove(key)
-            self.__keys.append(key)
-            self.cache_data[key] = item
+            del self.cache_data[discard]
+            self.list_name.pop(0)
 
     def get(self, key):
-        """get value of cache_data dictionary
-        """
-        if not key or key not in self.cache_data:
+        """Get Method"""
+        if key is None or self.cache_data.get(key) is None:
             return None
-        self.__keys.remove(key)
-        self.__keys.append(key)
+        if key in self.list_name:
+            if self.list_name[-1] != key:
+                self.list_name.remove(key)
+                self.list_name.append(key)
+
         return self.cache_data[key]
